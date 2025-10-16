@@ -1,35 +1,67 @@
-//Canal de YouTube -> RobotUNOs
-//Proyecto: Grua con servomotores
-#include <Servo.h>
-//Definicion de los servos
-Servo servo1;
-Servo servo2;
-int eje1=90;
-int eje2=90;
-void setup(){  
-  servo1.attach(7);
-  servo2.attach(6);
+// Canal de YouTube -> RobotUNOs
+// Projeto: Grua com servomotores
+// Este código controla dois servomotores usando dois potenciômetros.
+// Cada potenciômetro ajusta suavemente a posição de um servo, simulando o controle de uma grua (guindaste).
+
+#include <Servo.h> // Inclui a biblioteca Servo.h para facilitar o controle de servos
+
+// Declaração dos objetos servo
+Servo servo1; // Servo responsável pelo eixo 1 da grua
+Servo servo2; // Servo responsável pelo eixo 2 da grua
+
+// Variáveis que armazenam a posição atual de cada servo (iniciam em 90 graus, posição central)
+int eixo1 = 90;
+int eixo2 = 90;
+
+void setup() {
+  // Conecta os servos aos pinos digitais
+  servo1.attach(7); // servo1 conectado ao pino digital 7
+  servo2.attach(6); // servo2 conectado ao pino digital 6
+
+  // Define a posição inicial dos servos em 90 graus
   servo1.write(90);
   servo2.write(90);
 }
-void loop(){
-  //SERVO 1
-  if (analogRead(0)<200 && eje1<180){
-    eje1++;
-    servo1.write(eje1);
+
+void loop() {
+  // ----------------------------
+  // CONTROLE DO SERVO 1 (eixo1)
+  // ----------------------------
+
+  // Lê o valor analógico da porta A0 (provavelmente conectado a um potenciômetro)
+  // Se o valor for menor que 200 e o ângulo for menor que 180,
+  // aumenta a posição do servo1 em 1 grau (gira em um sentido)
+  if (analogRead(0) < 200 && eixo1 < 180) {
+    eixo1++;                 // incrementa o ângulo
+    servo1.write(eixo1);     // atualiza a posição do servo1
   }
-  if (analogRead(0)>700 && eje1>0){
-    eje1--;
-    servo1.write(eje1);
+
+  // Se o valor for maior que 700 e o ângulo for maior que 0,
+  // diminui a posição do servo1 em 1 grau (gira no outro sentido)
+  if (analogRead(0) > 700 && eixo1 > 0) {
+    eixo1--;                 // decrementa o ângulo
+    servo1.write(eixo1);     // atualiza a posição do servo1
   }
-  //SERVO 2
-  if (analogRead(1)<200 && eje2<180){
-    eje2++;
-    servo2.write(eje2);
+
+  // ----------------------------
+  // CONTROLE DO SERVO 2 (eixo2)
+  // ----------------------------
+
+  // Mesma lógica para o segundo potenciômetro conectado na porta A1,
+  // controlando o segundo servo (servo2)
+
+  if (analogRead(1) < 200 && eixo2 < 180) {
+    eixo2++;                 // incrementa o ângulo
+    servo2.write(eixo2);     // atualiza a posição do servo2
   }
-  if (analogRead(1)>700 && eje2>0){
-    eje2--;
-    servo2.write(eje2);
+
+  if (analogRead(1) > 700 && eixo2 > 0) {
+    eixo2--;                 // decrementa o ângulo
+    servo2.write(eixo2);     // atualiza a posição do servo2
   }
+
+  // Pequeno atraso para suavizar o movimento e evitar oscilações
   delay(15);
 }
+
+//https://robotuno.com/proyecto-grua-con-arduino/#video-explicacion-proyecto-grua-con-arduino
