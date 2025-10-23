@@ -1,67 +1,85 @@
-// Canal de YouTube -> RobotUNOs
-// Projeto: Grua com servomotores
-// Este código controla dois servomotores usando dois potenciômetros.
-// Cada potenciômetro ajusta suavemente a posição de um servo, simulando o controle de uma grua (guindaste).
+// ------------------------------------------------------------
+// Canal de YouTube: RobotUNOs
+// Projeto: Grua (guindaste) com servomotores
+// ------------------------------------------------------------
+// Este programa controla dois servomotores usando dois potenciômetros.
+// Cada potenciômetro atua como uma alavanca de controle: girar o potenciômetro
+// faz o servo girar lentamente para um lado ou para o outro.
+//
+// Assim, simulamos o controle manual de uma grua,
+// onde cada eixo (base e braço, por exemplo) é movido separadamente.
+//
+// ------------------------------------------------------------
 
-#include <Servo.h> // Inclui a biblioteca Servo.h para facilitar o controle de servos
+// Incluímos a biblioteca padrão de servos do Arduino.
+// Ela permite controlar a posição de um servomotor facilmente,
+// sem precisar gerar manualmente os pulsos de controle (PWM).
+#include <Servo.h>
 
-// Declaração dos objetos servo
-Servo servo1; // Servo responsável pelo eixo 1 da grua
-Servo servo2; // Servo responsável pelo eixo 2 da grua
+// Criamos dois objetos "Servo", que representam cada motor.
+Servo servo1; // Servo responsável por um dos eixos (por exemplo, a base)
+Servo servo2; // Servo responsável por outro eixo (por exemplo, o braço da grua)
 
-// Variáveis que armazenam a posição atual de cada servo (iniciam em 90 graus, posição central)
+// Variáveis que guardam a posição atual de cada servo em graus (0 a 180).
+// Começamos ambos em 90 graus (posição central).
 int eixo1 = 90;
 int eixo2 = 90;
 
 void setup() {
-  // Conecta os servos aos pinos digitais
-  servo1.attach(7); // servo1 conectado ao pino digital 7
-  servo2.attach(6); // servo2 conectado ao pino digital 6
+  // Ligamos (associamos) os servos aos pinos digitais escolhidos.
+  // Esses pinos enviam o sinal de controle PWM que define o ângulo do servo.
+  servo1.attach(7); // o servo1 recebe comandos pelo pino digital 7
+  servo2.attach(6); // o servo2 recebe comandos pelo pino digital 6
 
-  // Define a posição inicial dos servos em 90 graus
-  servo1.write(90);
-  servo2.write(90);
+  // Definimos a posição inicial de ambos os servos.
+  servo1.write(90); // centraliza o servo1
+  servo2.write(90); // centraliza o servo2
 }
 
 void loop() {
-  // ----------------------------
-  // CONTROLE DO SERVO 1 (eixo1)
-  // ----------------------------
+  // ============================================================
+  // CONTROLE DO SERVO 1 — eixo1 (potenciômetro no pino A0)
+  // ============================================================
 
-  // Lê o valor analógico da porta A0 (provavelmente conectado a um potenciômetro)
-  // Se o valor for menor que 200 e o ângulo for menor que 180,
-  // aumenta a posição do servo1 em 1 grau (gira em um sentido)
-  if (analogRead(0) < 200 && eixo1 < 180) {
-    eixo1++;                 // incrementa o ângulo
-    servo1.write(eixo1);     // atualiza a posição do servo1
+  // O potenciômetro funciona como um divisor de tensão.
+  // A leitura analógica (0 a 1023) indica sua posição.
+  int leitura1 = analogRead(A0); // lê o valor do potenciômetro 1
+
+  // Se o potenciômetro estiver girado para um lado (valor < 200),
+  // queremos mover o servo levemente no sentido "horário".
+  if (leitura1 < 200 && eixo1 < 180) {
+    eixo1++;              // aumenta o ângulo (move 1 grau para frente)
+    servo1.write(eixo1);  // envia o novo ângulo para o servo
   }
 
-  // Se o valor for maior que 700 e o ângulo for maior que 0,
-  // diminui a posição do servo1 em 1 grau (gira no outro sentido)
-  if (analogRead(0) > 700 && eixo1 > 0) {
-    eixo1--;                 // decrementa o ângulo
-    servo1.write(eixo1);     // atualiza a posição do servo1
+  // Se o potenciômetro estiver girado para o outro lado (valor > 700),
+  // movemos o servo no sentido "anti-horário".
+  if (leitura1 > 700 && eixo1 > 0) {
+    eixo1--;              // diminui o ângulo (1 grau para trás)
+    servo1.write(eixo1);  // atualiza o servo
   }
 
-  // ----------------------------
-  // CONTROLE DO SERVO 2 (eixo2)
-  // ----------------------------
+  // ============================================================
+  // CONTROLE DO SERVO 2 — eixo2 (potenciômetro no pino A1)
+  // ============================================================
 
-  // Mesma lógica para o segundo potenciômetro conectado na porta A1,
-  // controlando o segundo servo (servo2)
+  // O mesmo raciocínio vale para o segundo servo e potenciômetro:
+  int leitura2 = analogRead(A1); // lê o valor do potenciômetro 2
 
-  if (analogRead(1) < 200 && eixo2 < 180) {
-    eixo2++;                 // incrementa o ângulo
-    servo2.write(eixo2);     // atualiza a posição do servo2
+  if (leitura2 < 200 && eixo2 < 180) {
+    eixo2++;
+    servo2.write(eixo2);
   }
 
-  if (analogRead(1) > 700 && eixo2 > 0) {
-    eixo2--;                 // decrementa o ângulo
-    servo2.write(eixo2);     // atualiza a posição do servo2
+  if (leitura2 > 700 && eixo2 > 0) {
+    eixo2--;
+    servo2.write(eixo2);
   }
 
-  // Pequeno atraso para suavizar o movimento e evitar oscilações
+  // ------------------------------------------------------------
+  // Pequeno atraso para:
+  // 1. Evitar movimentos muito bruscos (suaviza a resposta)
+  // 2. Impedir leituras muito rápidas que fariam o servo "vibrar"
+  // ------------------------------------------------------------
   delay(15);
 }
-
-//https://robotuno.com/proyecto-grua-con-arduino/#video-explicacion-proyecto-grua-con-arduino
